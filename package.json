@@ -1,0 +1,26 @@
+{
+  "name": "imonke",
+  "version": "0.1.0",
+  "description": "A JavaScript api interface for iMonke",
+  "main": "src/index",
+  "scripts": {
+    "test": "jest ./test --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gastrodon/imonke.js.git"
+  },
+  "author": "Zero <mail@gastrodon.io>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/gastrodon/imonke.js/issues"
+  },
+  "homepage": "https://github.com/gastrodon/imonke.js#readme",
+  "dependencies": {
+    "axios": "^0.20.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.8.1",
+    "jest": "^26.4.2"
+  }
+}
