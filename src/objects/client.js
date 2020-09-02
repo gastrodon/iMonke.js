@@ -76,6 +76,7 @@ class Client extends EventEmitter {
             throw "password or secret is required"
         }
 
+        let ok
         try {
             let response = await this.request({
                 method: "POST",
@@ -86,11 +87,14 @@ class Client extends EventEmitter {
             this._secret = response.auth.secret
             this._token = response.auth.token
             this._token_expires = response.auth.expires
-            this.emit("login", true)
+            ok = true
         } catch (err) {
-            this._token = null
-            this.emit("login", false)
+            ok = false
+        } finally {
+            this.emit("login", ok)
         }
+
+        return ok
     }
 }
 

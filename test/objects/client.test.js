@@ -49,9 +49,9 @@ test("login password", async () => {
         api,
         email,
     })
-    await client.login({
+    expect(await client.login({
         password
-    })
+    })).toBe(true)
 
     expect(client._secret).toBeTruthy()
     expect(client._token).toBeTruthy()
@@ -66,9 +66,9 @@ test("login bad password", async () => {
     let callback = jest.fn()
     client.on("login", callback)
 
-    await client.login({
+    expect(await client.login({
         password: "Ah shit, here we go again"
-    })
+    })).toBe(false)
 
     setTimeout(() => {
         expect(callback).toHaveBeenCalledWith(false)
@@ -82,9 +82,9 @@ test("login bad secret", async () => {
     let callback = jest.fn()
     client.on("login", callback)
 
-    await client.login({
+    expect(await client.login({
         secret: "You picked the wrong house fool"
-    })
+    })).toBe(false)
 
     setTimeout(() => {
         expect(callback).toHaveBeenCalledWith(false)
@@ -99,7 +99,7 @@ test("login with jack and email", async () => {
     expect(client.login()).rejects.toEqual("password or secret is required")
 })
 
-test("login with jack and shot", async () => {
+test("login with jack and shit", async () => {
     expect((new Client()).login()).rejects.toEqual("email is required")
 })
 
@@ -125,7 +125,7 @@ test("login stored secret", async () => {
         get: async () => {},
     })
 
-    await client.login()
+    expect(await client.login()).toBe(true)
 
     expect(client._secret).toBeTruthy()
     expect(client._token).toBeTruthy()
@@ -146,9 +146,9 @@ test("secret login", async () => {
     let secret = client._secret
 
     client._secret = null
-    await client.login({
+    expect(await client.login({
         secret
-    })
+    })).toBe(true)
 
     expect(client._secret).toBeTruthy()
     expect(client._token).toBeTruthy()
