@@ -5,12 +5,19 @@ const axios = require("axios")
 const api = "http://imonke.gastrodon.io"
 
 class Client extends EventEmitter {
+    route = "/me"
+    key = "user"
+
     constructor(opts = {}) {
         super(opts)
 
         this._api = opts.api || api
         this._email = opts.email || null
         this._secret = opts.secret || null
+
+        this._id = null
+        this._data = null
+        this._fresh = false
         this._token = null
         this._token_expires = 0
     }
@@ -49,11 +56,92 @@ class Client extends EventEmitter {
         })()
     }
 
+    get fresh() {
+        this._fresh = true
+        return this
+    }
+
+    get data() {
+        return (async () => {
+            if (!this._data || this._fresh) {
+                let response = await this.request({
+                    method: "GET",
+                    url: `${this.api}${this.route}`,
+                })
+
+                this._data = response[this.key] || null
+                this._fresh = false
+            }
+
+            return this._data
+        })()
+    }
+
+    get id () {
+        return (async () => {
+            if (!this._id) {
+                this._id = await this.get("id")
+            }
+
+            return this._id
+        })()
+    }
+
+    get nick () {
+        return this.get("nick")
+    }
+
+    get email () {
+        return this.get("email")
+    }
+
+    get bio () {
+        return this.get("bio")
+    }
+
+    get admin () {
+        return this.get("admin")
+    }
+
+    get moderator() {
+        return this.get("moderator")
+    }
+
+    get created () {
+        return this.get("created")
+    }
+
+    get post_count () {
+        return this.get("post_count")
+    }
+
+    get subscriber_count () {
+        return this.get("subscriber_count")
+    }
+
+    get subscription_count () {
+        return this.get("subscription_count")
+    }
+
+    async get(name, opts) {
+        opts = opts || {}
+        let freshable = opts.freshable === undefined ? true : opts.freshable
+        let got = (await this.data)[name]
+
+        if (got === undefined && freshable) {
+            got = (await this.fresh.data)[name]
+        }
+
+        return got
+    }
+
     async request(opts = {}) {
-        let headers = opts.headers ? {
-            ...(await this.header),
-            ...opts.headers
-        } : await this.headers
+        opts = {
+            headers: {...(await this.headers), ...(opts.headers || {})},
+            validateStatus: null,
+            ...opts,
+        }
+
         return (await axios(opts)).data
     }
 

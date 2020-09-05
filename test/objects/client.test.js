@@ -10,6 +10,15 @@ const password = "foobar2000"
 
 jest.setTimeout(30000)
 
+async function logged_client () {
+    let client = new Client({
+        api
+    })
+
+    await client.login({email, password})
+    return client
+}
+
 test("client constructs", async () => {
     expect(new Client()).not.toBeNull()
     expect((new Client()).api).not.toBeNull()
@@ -213,4 +222,137 @@ test("headers rotate when expired token", async () => {
     expect(client._token_expires).toBeTruthy()
     expect(client._secret).not.toBe(secret)
     expect(client._token).not.toBe(token)
+})
+
+test("data is fetched", async () => {
+    let client = await logged_client()
+
+    expect(Object.keys(await client.data)).not.toEqual(0)
+})
+
+test("data is fresh", async () => {
+    let client = await logged_client()
+
+    await client.data
+    client._data.nick = "luger"
+
+    expect((await client.fresh.data).nick).not.toEqual("luger")
+})
+
+test("data is got", async () => {
+    let client = await logged_client()
+
+    await client.data
+    expect(client._data.nick).not.toBeFalsy()
+    expect((await client.get("nick"))).toEqual((await client.data).nick)
+})
+
+test("data is freshly got", async () => {
+    let client = await logged_client()
+
+    await client.data
+    client._data.nick = "something"
+
+    expect(await client.fresh.get("nick")).not.toEqual("something")
+})
+
+test("data is updated if no data", async () => {
+    let client = await logged_client()
+
+    expect(await client.get("nick")).not.toBeFalsy()
+})
+
+test("data is updated if missing", async () => {
+    let client = await logged_client()
+
+    await client.data
+    client._data.nick = undefined
+    expect(await client.get("nick")).not.toEqual(undefined)
+    expect(await client.get("nick")).not.toBeFalsy()
+})
+
+test("data is updated if missing and freshable", async () => {
+    let client = await logged_client()
+
+    await client.data
+    client._data.nick = undefined
+    expect(await client.get("nick", {freshable: true})).not.toEqual(undefined)
+    expect(await client.get("nick", {freshable: true})).not.toBeFalsy()
+})
+
+test("data is not updated if not freshable", async () => {
+    let client = await logged_client()
+
+    await client.data
+    client._data.nick = undefined
+    expect(await client.get("nick", {freshable: false})).toEqual(undefined)
+})
+
+test("getter id", async () => {
+    let client = await logged_client()
+
+    expect(await client.id).not.toBeFalsy()
+    expect(client._id).not.toBeFalsy()
+    expect((await client.id).length).toEqual(36)
+})
+
+test("getter nick", async () => {
+    let client = await logged_client()
+
+    expect(await client.nick).not.toBeFalsy()
+})
+
+test("getter email", async () => {
+    let client = await logged_client()
+
+    expect(await client.email).toEqual(email)
+})
+
+test("getter bio", async () => {
+    let client = await logged_client()
+
+    expect(await client.bio).not.toBeNull()
+    expect(await client.bio).not.toBeUndefined()
+})
+
+test("getter admin", async () => {
+    let client = await logged_client()
+
+    expect(await client.admin).not.toBeNull()
+    expect(await client.admin).not.toBeUndefined()
+})
+
+test("getter moderator", async () => {
+    let client = await logged_client()
+
+    expect(await client.moderator).not.toBeNull()
+    expect(await client.moderator).not.toBeUndefined()
+})
+
+test("getter created", async () => {
+    let client = await logged_client()
+
+    expect(await client.created).toBeLessThan(client.now)
+    expect(await client.created).toBeGreaterThan(0)
+})
+
+test("getter post_count", async () => {
+    let client = await logged_client()
+
+    expect(await client.post_count).not.toBeNull()
+    expect(await client.post_count).not.toBeUndefined()
+})
+
+test("getter subscriber_count", async () => {
+    let client = await logged_client()
+
+    expect(await client.subscriber_count).not.toBeNull()
+    expect(await client.subscriber_count).not.toBeUndefined()
+})
+
+test("getter subscription_count", async () => {
+    let client = await logged_client()
+
+    expect(await client.subscription_count).not.toBeNull()
+    expect(await client.subscription_count).not.toBeUndefined()
 })
