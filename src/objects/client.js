@@ -92,7 +92,9 @@ class Client extends EventEmitter {
     }
 
     get email () {
-        return this.get("email")
+        return (async () => {
+            return this._email
+        })()
     }
 
     get bio () {
@@ -173,6 +175,7 @@ class Client extends EventEmitter {
             })
 
             this._email = email
+            console.log(this._email)
             this._secret = response.auth.secret
             this._token = response.auth.token
             this._token_expires = response.auth.expires
