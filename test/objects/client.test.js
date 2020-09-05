@@ -141,6 +141,19 @@ test("login stored secret", async () => {
     expect(client._token_expires).toBeTruthy()
 })
 
+test("login preserves email", async () => {
+    let client = new Client({
+        api,
+    })
+
+    await client.login({
+        email,
+        password,
+    })
+
+    expect(client._email).toEqual(email)
+})
+
 test("secret login", async () => {
     let client = new Client({
         api,

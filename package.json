@@ -1,6 +1,6 @@
 {
   "name": "imonke",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A JavaScript api interface for iMonke",
   "main": "src/index",
   "scripts": {
