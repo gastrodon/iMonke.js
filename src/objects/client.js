@@ -14,6 +14,9 @@ class Client extends MonkeThing {
         this._secret = opts.secret || null
         this._token = null
         this._token_expires = 0
+
+        this._created = null
+        this._user = null
     }
 
     get headers() {
@@ -94,6 +97,16 @@ class Client extends MonkeThing {
 
     get subscription_count() {
         return this.get("subscription_count")
+    }
+
+    get user() {
+        return (async () => {
+            if (!this._user) {
+                this._user = new (require("./user"))({id: await this.id})
+            }
+
+            return this._user
+        })()
     }
 
     async login(opts = {}) {

@@ -378,3 +378,15 @@ test("getter subscription_count", async () => {
     expect(await client.subscription_count).not.toBeNull()
     expect(await client.subscription_count).not.toBeUndefined()
 })
+
+test("getter user", async () => {
+    let client = await logged_client()
+
+    expect(await (await client.user).id).toEqual(await client.id)
+})
+
+test("getter user not authed", async () => {
+    let client = new Client({api})
+
+    expect(client.user).rejects.toThrow()
+})
