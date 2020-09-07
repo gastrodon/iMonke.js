@@ -10,12 +10,15 @@ const password = "foobar2000"
 
 jest.setTimeout(30000)
 
-async function logged_client () {
+async function logged_client() {
     let client = new Client({
         api
     })
 
-    await client.login({email, password})
+    await client.login({
+        email,
+        password
+    })
     return client
 }
 
@@ -289,8 +292,12 @@ test("data is updated if missing and freshable", async () => {
 
     await client.data
     client._data.nick = undefined
-    expect(await client.get("nick", {freshable: true})).not.toEqual(undefined)
-    expect(await client.get("nick", {freshable: true})).not.toBeFalsy()
+    expect(await client.get("nick", {
+        freshable: true
+    })).not.toEqual(undefined)
+    expect(await client.get("nick", {
+        freshable: true
+    })).not.toBeFalsy()
 })
 
 test("data is not updated if not freshable", async () => {
@@ -298,7 +305,9 @@ test("data is not updated if not freshable", async () => {
 
     await client.data
     client._data.nick = undefined
-    expect(await client.get("nick", {freshable: false})).toEqual(undefined)
+    expect(await client.get("nick", {
+        freshable: false
+    })).toEqual(undefined)
 })
 
 test("getter id", async () => {

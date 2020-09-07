@@ -1,33 +1,19 @@
-const EventEmitter = require("events")
+const MonkeThing = require("./monkething")
 
-const axios = require("axios")
-
-const api = "http://imonke.gastrodon.io"
-
-class Client extends EventEmitter {
-    route = "/me"
-    key = "user"
-
+class Client extends MonkeThing {
     constructor(opts = {}) {
-        super(opts)
+        super({
+            client: {},
+            ...opts,
+        })
+        this.client = this
+        this.route = "/me"
+        this.key = "user"
 
-        this._api = opts.api || api
         this._email = opts.email || null
         this._secret = opts.secret || null
-
-        this._id = null
-        this._data = null
-        this._fresh = false
         this._token = null
         this._token_expires = 0
-    }
-
-    get now() {
-        return Math.round((new Date()).getTime() / 1000)
-    }
-
-    get api() {
-        return this._api
     }
 
     get headers() {
@@ -56,28 +42,7 @@ class Client extends EventEmitter {
         })()
     }
 
-    get fresh() {
-        this._fresh = true
-        return this
-    }
-
-    get data() {
-        return (async () => {
-            if (!this._data || this._fresh) {
-                let response = await this.request({
-                    method: "GET",
-                    url: `${this.api}${this.route}`,
-                })
-
-                this._data = response[this.key] || null
-                this._fresh = false
-            }
-
-            return this._data
-        })()
-    }
-
-    get id () {
+    get id() {
         return (async () => {
             if (!this._id) {
                 this._id = await this.get("id")
@@ -87,21 +52,31 @@ class Client extends EventEmitter {
         })()
     }
 
-    get nick () {
+    get created() {
+        return (async () => {
+            if (!this._created) {
+                this._created = await this.get("created")
+            }
+
+            return this._created
+        })()
+    }
+
+    get nick() {
         return this.get("nick")
     }
 
-    get email () {
+    get email() {
         return (async () => {
             return this._email
         })()
     }
 
-    get bio () {
+    get bio() {
         return this.get("bio")
     }
 
-    get admin () {
+    get admin() {
         return this.get("admin")
     }
 
@@ -109,42 +84,16 @@ class Client extends EventEmitter {
         return this.get("moderator")
     }
 
-    get created () {
-        return this.get("created")
-    }
-
-    get post_count () {
+    get post_count() {
         return this.get("post_count")
     }
 
-    get subscriber_count () {
+    get subscriber_count() {
         return this.get("subscriber_count")
     }
 
-    get subscription_count () {
+    get subscription_count() {
         return this.get("subscription_count")
-    }
-
-    async get(name, opts) {
-        opts = opts || {}
-        let freshable = opts.freshable === undefined ? true : opts.freshable
-        let got = (await this.data)[name]
-
-        if (got === undefined && freshable) {
-            got = (await this.fresh.data)[name]
-        }
-
-        return got
-    }
-
-    async request(opts = {}) {
-        opts = {
-            headers: {...(await this.headers), ...(opts.headers || {})},
-            validateStatus: null,
-            ...opts,
-        }
-
-        return (await axios(opts)).data
     }
 
     async login(opts = {}) {
