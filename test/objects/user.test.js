@@ -2,8 +2,8 @@
  * @jest-environment node
  */
 
-const nick = "zero"
 const User = require("../../src/objects/user")
+const nick = "zero"
 
 jest.setTimeout(30000)
 
