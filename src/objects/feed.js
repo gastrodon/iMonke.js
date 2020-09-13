@@ -25,10 +25,27 @@ class Feed extends MonkeThing {
                 after: opts.after || null,
             },
         })
-        
+
         return response[this.key].map(
             it => new Content({id: it.id, data: it})
         )
+    }
+
+    get content() {
+        return (async function* (instance) {
+            let offset = 0
+            let buffer = []
+
+            do {
+                buffer = await instance.get({
+                    offset,
+                    size: instance.paginated_size,
+                })
+
+                yield* buffer
+                offset += instance.paginated_size
+            } while (buffer.length)
+        })(this)
     }
 }
 
