@@ -59,15 +59,14 @@ class MonkeThing extends EventEmitter {
             ...opts,
             headers: {
                 ...(await this.client.headers),
-                ...(opts.headers || {})
+                ...(opts.headers || {}),
             },
         }
 
         return (await axios(opts)).data
     }
 
-    async get(name, opts) {
-        opts = opts || {}
+    async get(name, opts = {}) {
         let freshable = opts.freshable === undefined ? true : opts.freshable
         let got = (await this.data)[name]
 
