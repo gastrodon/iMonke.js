@@ -3,10 +3,10 @@
  */
 
 const Content = require("../../src/objects/content")
-const id = "afa0f9fe-6261-44e9-a49b-31da7d6dee48"
+const Feed = require("../../src/objects/feed")
 const post_data = {
-    id: id,
-    author: "39f7edec-945b-4e71-88fd-cea5b298ff75",
+    id: "<post_id>",
+    author: "<author_id>",
     file_url: "http://file.gastrodon.io/foobar",
     created: 1599356556,
     comment_count: 5,
@@ -29,13 +29,14 @@ function get_content () {
 }
 
 test("content from id", async () => {
+    let id = await (await (new Feed({feed: "all"})).get())[0].id
     let content = new Content({id})
 
     expect(await content.id).toEqual(id)
 })
 
 test("author from content", async () => {
-    let content = new Content({id})
+    let content = (await (new Feed({feed: "all"})).get())[0]
 
     expect(await (await content.author).id).toEqual((await content.data).author)
 })
