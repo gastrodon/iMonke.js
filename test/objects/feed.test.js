@@ -32,6 +32,19 @@ test("get content size", async () => {
     expect((await feed.get({size: 5})).length).toEqual(5)
 })
 
+test("get content before", async () => {
+    let offset = 5
+    let size = 10
+    let feed = all_feed()
+    let first = await feed.get({size})
+    let second = await feed.get({size, before: await first[offset].id})
+
+    let index = 0
+    for (let content of first.slice(offset+1)) {
+        expect(await content.id).toEqual(await second[index++].id)
+    }
+})
+
 test("content generator", async () => {
     let feed = new Feed({
         feed: "all",
