@@ -21,8 +21,7 @@ class Feed extends MonkeThing {
             url: this.api + this.route,
             params: {
                 size: opts.size || this.paginated_size,
-                offset: opts.offset || null,
-                after: opts.after || null,
+                before: opts.before || null,
             },
         })
 
@@ -33,17 +32,16 @@ class Feed extends MonkeThing {
 
     get content() {
         return (async function* (instance) {
-            let offset = 0
+            let before = ""
             let buffer = []
 
             do {
-                buffer = await instance.get({
-                    offset,
-                    size: instance.paginated_size,
-                })
-
                 yield* buffer
-                offset += instance.paginated_size
+
+                buffer = await instance.get({
+                    size: instance.paginated_size,
+                    before: buffer.length ? await buffer[buffer.length-1].id : "",
+                })
             } while (buffer.length)
         })(this)
     }

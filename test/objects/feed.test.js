@@ -6,7 +6,7 @@ const Feed = require("../../src/objects/feed")
 
 jest.setTimeout(30000)
 
-function new_feed() {
+function all_feed() {
     return new Feed({feed: "all"})
 }
 
@@ -21,14 +21,14 @@ test("create feed throws without feed", async () => {
 })
 
 test("get content", async () => {
-    let feed = new_feed()
+    let feed = all_feed()
     expect((await feed.get()).length).not.toEqual(0)
     expect((await feed.get()).length).not.toBeNull()
     expect((await feed.get()).length).not.toBeUndefined()
 })
 
 test("get content size", async () => {
-    let feed = new_feed()
+    let feed = all_feed()
     expect((await feed.get({size: 5})).length).toEqual(5)
 })
 
@@ -39,13 +39,13 @@ test("content generator", async () => {
     })
 
     let limit = 20
-    let last = {created: 2 ** 64}
+    let prev = { created: 0 }
     for await (it of feed.content) {
         if (!limit--) {
             break
         }
 
-        expect(await it.created).toBeLessThanOrEqual(await last.created)
-        last = await it
+        expect(await prev.created).toBeLessThanOrEqual(await it.created)
+        it = prev
     }
 })
