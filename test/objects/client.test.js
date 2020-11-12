@@ -4,16 +4,13 @@
 
 const Client = require("../../src/objects/client")
 
-const api = "http://10.0.0.10"
 const email = "mail@gastrodon.io"
 const password = "foobar2000"
 
 jest.setTimeout(30000)
 
 async function logged_client() {
-    let client = new Client({
-        api
-    })
+    let client = new Client()
 
     await client.login({
         email,
@@ -58,7 +55,6 @@ test("now", async () => {
 
 test("login password", async () => {
     let client = new Client({
-        api,
         email,
     })
     expect(await client.login({
@@ -117,7 +113,6 @@ test("login with jack and shit", async () => {
 
 test("login stored secret", async () => {
     let secreter = new Client({
-        api,
         email
     })
     await secreter.login({
@@ -126,7 +121,6 @@ test("login stored secret", async () => {
 
 
     let client = new Client({
-        api,
         email,
         secret: secreter._secret
     })
@@ -145,9 +139,7 @@ test("login stored secret", async () => {
 })
 
 test("login preserves email", async () => {
-    let client = new Client({
-        api,
-    })
+    let client = new Client()
 
     await client.login({
         email,
@@ -159,7 +151,6 @@ test("login preserves email", async () => {
 
 test("secret login", async () => {
     let client = new Client({
-        api,
         email,
     })
 
@@ -386,7 +377,7 @@ test("getter user", async () => {
 })
 
 test("getter user not authed", async () => {
-    let client = new Client({api})
+    let client = new Client()
 
     expect(client.user).rejects.toThrow()
 })
