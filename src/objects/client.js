@@ -41,7 +41,6 @@ class Client extends MonkeThing {
             } finally {
                 return await this.headers
             }
-
         })()
     }
 
@@ -148,6 +147,33 @@ class Client extends MonkeThing {
         }
 
         return ok
+    }
+
+    async create(opts = {}) {
+        for (let key of ["nick", "email", "password"]) {
+            if (!opts[key]) {
+                throw `${key} is required`
+            }
+        }
+
+        try {
+            let response = await this.request({
+                method: "POST",
+                url: `${this.api}/user`,
+                data: opts,
+            })
+
+            return await this.login({
+                email: opts.email,
+                password: opts.password,
+            })
+        } catch (err) {
+            if (err.response.status === 409) {
+                let key = err.response.data.key
+                throw `${key} ${opts[key]} already taken`
+            }
+            return false
+        }
     }
 }
 

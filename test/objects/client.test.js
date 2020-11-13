@@ -19,6 +19,15 @@ async function logged_client() {
     return client
 }
 
+function create_data(add_bio) {
+    return {
+        nick: `_test_${Math.random().toString(36).substring(2)}`,
+        email: `_test_${Math.random().toString(36).substring(2)}@imonke.io`,
+        bio: add_bio ? `Created at ${Date.now()} in jest` : null,
+        password: "foobar2000",
+    }
+}
+
 test("client constructs", async () => {
     expect(new Client()).not.toBeNull()
     expect((new Client()).api).not.toBeNull()
@@ -147,6 +156,61 @@ test("login preserves email", async () => {
     })
 
     expect(client._email).toEqual(email)
+})
+
+test("create", async () => {
+    let client = new Client()
+    let data = create_data()
+    expect(await client.create(data)).toBe(true)
+    expect(await client.nick).toEqual(data.nick)
+    expect(await client.email).toEqual(data.email)
+})
+
+test("create with bio", async () => {
+    let client = new Client()
+    let data = create_data(true)
+    await client.create(data)
+    expect(await client.bio).toBe(data.bio)
+    expect(await client.bio).not.toBeUndefined()
+    expect(await client.bio).not.toBeNull()
+})
+
+test("create without data", async () => {
+    let client = new Client()
+    expect(client.create()).rejects.not.toEqual(true)
+})
+
+test("create without nick", async () => {
+    let client = new Client()
+    expect(client.create({email: "bar", password: "bar"})).rejects.toEqual("nick is required")
+})
+
+test("create without email", async () => {
+    let client = new Client()
+    expect(client.create({nick: "bar", password: "bar"})).rejects.toEqual("email is required")
+})
+
+test("create without password", async () => {
+    let client = new Client()
+    expect(client.create({nick: "bar", email: "bar"})).rejects.toEqual("password is required")
+})
+
+test("create conflict nick", async () => {
+    let data = create_data()
+    await (new Client()).create(data)
+    expect((new Client()).create({
+        ...create_data(),
+        nick: data.nick,
+    })).rejects.toEqual(`nick ${data.nick} already taken`)
+})
+
+test("create conflict email", async () => {
+    let data = create_data()
+    await (new Client()).create(data)
+    expect((new Client()).create({
+        ...create_data(),
+        email: data.email,
+    })).rejects.toEqual(`email ${data.email} already taken`)
 })
 
 test("secret login", async () => {
