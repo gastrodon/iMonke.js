@@ -175,6 +175,25 @@ class Client extends MonkeThing {
             return false
         }
     }
+
+    async key_exists(key, value) {
+        if (!key || !value) {
+            return false
+        }
+        
+        return (await this.request({
+            method: "GET",
+            url: `${this.api}/check/${key}/${value}`,
+        })).exists
+    }
+
+    async nick_exists(nick) {
+        return await this.key_exists("nick", nick)
+    }
+
+    async email_exists(email) {
+        return await this.key_exists("email", email)
+    }
 }
 
 module.exports = Client

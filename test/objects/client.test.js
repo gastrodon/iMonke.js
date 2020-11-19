@@ -213,6 +213,36 @@ test("create conflict email", async () => {
     })).rejects.toEqual(`email ${data.email} already taken`)
 })
 
+test("key exists no key", async () => {
+    expect(await (new Client()).key_exists("", "bar")).toBe(false)
+})
+
+test("key exists no value", async () => {
+    expect(await (new Client()).key_exists("bar", "")).toBe(false)
+})
+
+test("nick exists", async () => {
+    let data = create_data()
+    await (new Client()).create(data)
+    expect(await (new Client()).nick_exists(data.nick)).toBe(true)
+})
+
+test("email exists", async () => {
+    let data = create_data()
+    await (new Client()).create(data)
+    expect(await (new Client()).email_exists(data.email)).toBe(true)
+})
+
+test("nick doesn't exists", async () => {
+    let data = create_data()
+    expect(await (new Client()).nick_exists(data.nick)).toBe(false)
+})
+
+test("email doesn't exists", async () => {
+    let data = create_data()
+    expect(await (new Client()).email_exists(data.email)).toBe(false)
+})
+
 test("secret login", async () => {
     let client = new Client({
         email,
