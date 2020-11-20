@@ -1,3 +1,5 @@
+const FormData = require("form-data")
+const FS = require("fs")
 const MonkeThing = require("./monkething")
 
 class Client extends MonkeThing {
@@ -180,7 +182,7 @@ class Client extends MonkeThing {
         if (!key || !value) {
             return false
         }
-        
+
         return (await this.request({
             method: "GET",
             url: `${this.api}/check/${key}/${value}`,
@@ -193,6 +195,26 @@ class Client extends MonkeThing {
 
     async email_exists(email) {
         return await this.key_exists("email", email)
+    }
+
+    async upload_content(tags, featurable, nsfw, stream, size) {
+        let form = new FormData()
+        form.append("json", JSON.stringify({ tags, featurable, nsfw }), { contentType: "application/json" })
+        form.append("file", stream, { knownLength: size })
+
+        let response = await this.request({
+            method: "POST",
+            url: `${this.api}/content`,
+            data: form,
+            headers: { ...form.getHeaders(), "Content-Length": form.getLengthSync() },
+        })
+    }
+
+    async upload_content_file(tags, featurable, nsfw, path) {
+        return await this.upload_content(
+            tags, featurable, nsfw,
+            FS.createReadStream(path), FS.statSync(path).size,
+        )
     }
 }
 
