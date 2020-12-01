@@ -1,5 +1,4 @@
 const FormData = require("form-data")
-const FS = require("fs")
 const MonkeThing = require("./monkething")
 
 class Client extends MonkeThing {
@@ -208,13 +207,6 @@ class Client extends MonkeThing {
             data: form,
             headers: { ...form.getHeaders(), "Content-Length": form.getLengthSync() },
         })
-    }
-
-    async upload_content_file(tags, featurable, nsfw, path) {
-        return await this.upload_content(
-            tags, featurable, nsfw,
-            FS.createReadStream(path), FS.statSync(path).size,
-        )
     }
 }
 
