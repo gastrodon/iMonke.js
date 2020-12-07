@@ -3,9 +3,11 @@
  */
 
 const Client = require("../../src/objects/client")
+const { Readable } = require("stream")
 
 const email = "mail@gastrodon.io"
 const password = "foobar2000"
+const file_base64 = `iVBORw0KGgoAAAANSUhEUgAAAL0AAACQCAIAAADSh/2PAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFeSURBVHhe7dIxAQAwEAOhSol/ldXwN4MG3uDOGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLyh8IbCGwpvKLzhbvsBMeBKi+yN6wAAAABJRU5ErkJggg==`
 
 jest.setTimeout(30000)
 
@@ -474,4 +476,23 @@ test("getter user not authed", async () => {
     let client = new Client()
 
     expect(client.user).rejects.toThrow()
+})
+
+test("upload content base64 exists", async () => {
+    const tags = ["foo", "bar"]
+    const featurable = true
+    const nsfw = false
+
+    const client = await logged_client()
+    const response = await client.upload_content_base64(tags, featurable, nsfw, file_base64).catch(it => console.log(it.response))
+
+    expect(response.author).toBe(await client.id)
+    expect(response.mime).toBe("image/png")
+    expect(response.nsfw).toBe(nsfw)
+    expect(response.featurable).toBe(featurable)
+    expect(response.view_count).toBe(0)
+    expect(response.repub_count).toBe(0)
+    expect(response.like_count).toBe(0)
+    expect(response.dislike_count).toBe(0)
+    expect(response.comment_count).toBe(0)
 })

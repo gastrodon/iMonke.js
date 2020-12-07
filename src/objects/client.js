@@ -201,12 +201,25 @@ class Client extends MonkeThing {
         form.append("json", JSON.stringify({ tags, featurable, nsfw }), { contentType: "application/json" })
         form.append("file", stream, { knownLength: size })
 
-        let response = await this.request({
+        return (await this.request({
             method: "POST",
             url: `${this.api}/content`,
             data: form,
             headers: { ...form.getHeaders(), "Content-Length": form.getLengthSync() },
-        })
+        })).content
+    }
+
+    async upload_content_base64(tags, featurable, nsfw, base64_data) {
+        let form = new FormData()
+        form.append("json", JSON.stringify({ tags, featurable, nsfw }), { contentType: "application/json" })
+        form.append("file_base64", base64_data)
+
+        return (await this.request({
+            method: "POST",
+            url: `${this.api}/content`,
+            data: form,
+            headers: { ...(form.getHeaders !== undefined? form.getHeaders() : {}) },
+        })).content
     }
 }
 
