@@ -1,7 +1,7 @@
 const EventEmitter = require("events")
 const axios = require("axios")
 
-const api = "http://imonke.gastrodon.io"
+const api = "https://imonke.gastrodon.io"
 
 class MonkeThing extends EventEmitter {
     constructor(opts = {}) {
