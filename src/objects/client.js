@@ -171,7 +171,19 @@ class Client extends MonkeThing {
         } catch (err) {
             if (err.response.status === 409) {
                 let key = err.response.data.key
-                throw `${key} ${opts[key]} already taken`
+                throw {
+                    code: 409,
+                    kind: err.response.data.error,
+                    message: `${key} ${opts[key]} already taken`,
+                }
+            }
+
+            if (err.response.status === 400) {
+              throw "failed to create a user"
+              throw {
+                  code: 400,
+                  kind: err.response.data.error,
+                  message: "bad request! double check supplied data"
             }
             return false
         }
